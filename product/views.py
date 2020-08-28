@@ -1,16 +1,17 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required # only for logged in user
 from .models import product
 from django.utils import timezone
 
 def home(request):
-    return render(request, 'product/home.html')
+    Product = product.objects
+    return render(request, 'product/home.html', {'product': Product})
 
 @login_required
 def create(request):
     if request.method == 'POST':
         if request.POST['title'] and request.POST['body'] and request.POST['url'] and request.FILES['icon'] and request.FILES['image']:
-            Product = product()
+            Product = product() #induce class product
             Product.title = request.POST['title']
             Product.body = request.POST['body']
             if request.POST['url'].startswith('http://') or request.POST['url'].startswith('https://'):
@@ -21,9 +22,21 @@ def create(request):
             Product.image = request.FILES['image']
             Product.pub_date = timezone.datetime.now()
             Product.hunter = request.user ##imported in models
-            Product.save()
-            return redirect('home')
+            Product.save() #saved and given id
+            return redirect('/product/' + str(Product.id)) #it will jump to product urls.py
         else:
             return render(request, 'product/create.html', {'error': 'All fields must be filled'})
     else:
         return render(request, 'product/create.html')
+
+def detail(request, product_id): #urls.py pass request to here
+    Product = get_object_or_404(product, pk=product_id)
+    return render(request, 'product/detail.html', {'product': Product})
+
+@login_required
+def upvote(request, product_id):
+    if request.method == 'POST':
+        Product = get_object_or_404(product, pk=product_id)
+        Product.vote_total += 1
+        Product.save()
+        return redirect('/product/' + str(Product.id))

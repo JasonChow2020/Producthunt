@@ -18,5 +18,7 @@ from django.urls import path, include
 from . import views #** for path reference
 
 urlpatterns = [
-    path('create/', views.create, name='create'),
+    path('create', views.create, name='create'),
+    path('<int:product_id>', views.detail, name='detail'), #submitted request redirect to here
+    path('<int:product_id>/upvote', views.upvote, name='upvote'),
 ]
