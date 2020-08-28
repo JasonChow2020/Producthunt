@@ -4,7 +4,7 @@
 <h1>Home</h1>
 
 {% for product in product.all %}
-<div class="row pt-3">
+<div class="row pt-3"> <! –– parameter is needed for url 'detail', i.e. id ––>
     <div class="col-2" onclick="window.location='{% url 'detail' product.id %}';" style="cursor: pointer;"> <! –– allow landing to url by clicking on the object ––>
          <img src="{{ product.icon.url }}" class="img-fluid" /> <! –– a url for file/ image ––>
     </div>
